@@ -1,11 +1,31 @@
-const ACCESS_TOKEN = "MLY|27069975479318202|c526e5da37bd1125672c7ba9c54f1ae2";
+const ACCESS_TOKEN = CONFIG.ACCESS_TOKEN; //separate file for sensitive stuff
+coords = CONFIG.coords;
+const url = 'https://graph.mapillary.com/images?fields=id&lat='+coords.lat+'&lng='+coords.lng+'&radius=50&limit=1';
 
-const viewer = new mapillary.Viewer({
-  accessToken: ACCESS_TOKEN,
-  container: 'mly',
-  imageId: '779347306365050',
-  component: {
-    cover: false,
-    navigation: true,
+fetch(url, {
+  headers: {
+    "Authorization": "OAuth " + ACCESS_TOKEN,
   }
-});
+})
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    const imid = data.data[0].id;
+    const imidint = Number(imid);
+    console.log(imidint);
+
+    //viewer
+    const viewer = new mapillary.Viewer({
+      accessToken: ACCESS_TOKEN,
+      container: 'mly',
+      imageId: imidint,
+      component: {
+        cover: false,
+        navigation: true,
+        sequence: { visible: false, playing: false },
+      }
+    });
+  })
+  .catch(err => {
+    console.log('Fetch Error :-S', err);
+  });
